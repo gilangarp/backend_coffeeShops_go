@@ -13,14 +13,14 @@ type HandlerProduct struct {
 	*repository.RepoProduct
 }
 
-func NewProduct(r *repository.RepoProduct) *HandlerProduct{
+func NewProduct(r *repository.RepoProduct) *HandlerProduct {
 	return &HandlerProduct{r}
 }
 
 func (h *HandlerProduct) PostProduct(ctx *gin.Context){
 	product := models.Product{}
 
-	if err :=ctx.ShouldBind(&product); err!= nil {
+	if err := ctx.ShouldBind(&product); err!= nil {
 		ctx.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
@@ -38,10 +38,12 @@ func (h *HandlerProduct) FetchAllProduct(ctx *gin.Context){
 	category := ctx.Query("category")
 	favorite := ctx.Query("favoriteNpromo")
 	searchText := ctx.Query("searchText")
-
-	/* ini strig */
+	promo := ctx.Query("promo")
 	limit := ctx.Query("limit")
 	page := ctx.Query("page")
+
+	promoBool := promo == "true"
+	
 
 	limits , _ := strconv.Atoi(limit)
 	pages , _ := strconv.Atoi(page)
@@ -50,8 +52,7 @@ func (h *HandlerProduct) FetchAllProduct(ctx *gin.Context){
 		Category: category,
         Favorite: favorite,
         SearchText: searchText,
-
-		/* ini int */
+		Promo: promoBool,
 		Limit: limits,
 		Page: pages,
     }

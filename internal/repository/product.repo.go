@@ -3,7 +3,6 @@ package repository
 import (
 	"fmt"
 	"gilangarp/backend_coffeeShops_go/internal/models"
-	"strconv"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -17,37 +16,43 @@ func NewProduct(db *sqlx.DB) *RepoProduct {
 	return &RepoProduct{db}
 }
 
-func (r *RepoProduct) CreatedProduct(data *models.Product) (string, error){
-	 
-	query := `
-	INSERT INTO public.product
-		product_name,
-		img_product,
-		product_price,
-		product_description,
-		category_id,
-		favorite
-	VALUES
-	 	$1 , $2 , $3 , $4 , $5 , $6
-	`
+func (r *RepoProduct) CreatedProduct(data *models.Product) (string, error) {
+    query := `
+    INSERT INTO public.product(
+        product_name,
+        img_product,
+        product_price,
+        product_description,
+        category_id
+        )
+    VALUES
+        ($1, $2, $3, $4, $5)
+    `
 
-	_, err := r.NamedExec(query , data)
-	if err != nil {
-		return "" , err
-	}
+    _, err := r.Exec(query, data.Product_name, data.Img_product, data.Product_price, data.Product_description, data.Category_id)
+    if err != nil {
+        return "", err
+    }
 
-	return "1 data movie created" ,nil
+    return "1 data product created", nil
 }
+
 
 func (r *RepoProduct) GetAllProduct(params *models.Filter) (*models.Products, error) {
     query := `
-        SELECT p.id , p.product_name , p.img_product , p.product_price , p.product_description , c.categorie_name , p.favorite , p.created_at 
-FROM public.product p JOIN public.category c ON p.category_id = c.id 
+        SELECT p.id , p.product_name , p.img_product , p.product_price , p.product_description , c.categorie_name , p.created_at 
+		FROM 
+			public.product p 
+			JOIN public.category c ON p.category_id = c.id 
 
     `
     
     values := []interface{}{}
     whereClauses := []string{}
+
+	if params.Promo {
+		query += ` inner join public.promo prm on p.id = prm.product_id `;
+	}
 
     if params.SearchText  != "" {
         whereClauses = append(whereClauses, fmt.Sprintf("p.product_name ILIKE $%d", len(values)+1))
@@ -58,15 +63,6 @@ FROM public.product p JOIN public.category c ON p.category_id = c.id
         whereClauses = append(whereClauses, fmt.Sprintf("c.categorie_name = $%d", len(values)+1))
         values = append(values, params.Category)
     }
-
-    if params.Favorite != "" {
-		favoriteBool, err := strconv.ParseBool(params.Favorite)
-		if err != nil {
-			return nil, fmt.Errorf("invalid favorite value: %s", params.Favorite)
-		}
-		whereClauses = append(whereClauses, fmt.Sprintf("p.favorite = $%d", len(values)+1))
-		values = append(values, favoriteBool)
-	}
 
 	if params.Limit > 0 && params.Page > 0 {
 		limit := params.Limit
@@ -86,7 +82,6 @@ FROM public.product p JOIN public.category c ON p.category_id = c.id
         return nil, err
     }
 
-	fmt.Println(query)
-    return &data, nil
+	return &data, nil
 }
 
