@@ -33,8 +33,25 @@ func (h *HandlerProfile) PostProfile(ctx *gin.Context){
 	}
 
 	ctx.JSON(http.StatusOK, updatedProfile)
+}
 
+func (h *HandlerProfile) FetchAllProfile(ctx *gin.Context){
+	data , err := h.GetAllProfile()
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	ctx.JSON(200 , data)
+}
 
+func (h *HandlerProfile) FetchDetailProfile(ctx *gin.Context){
+	id := ctx.Param("id")
+	data , err := h.GetDetailProfile(id)
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	ctx.JSON(200 , data)
 }
 
 func (h *HandlerProfile) ProfileUpdate(ctx *gin.Context) {
@@ -56,3 +73,12 @@ func (h *HandlerProfile) ProfileUpdate(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, updatedProfile)
 }
 
+func (h *HandlerProfile) DeleteProfile(ctx *gin.Context){
+	id := ctx.Param("id")
+	data , err := h.DeleteProfiles(id)
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	ctx.JSON(200 , data)
+}

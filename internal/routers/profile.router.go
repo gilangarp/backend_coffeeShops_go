@@ -16,4 +16,8 @@ func Profile(g *gin.Engine, d *sqlx.DB) {
 
 	route.POST("/:id", handler.PostProfile)
 	route.PATCH("/:id", handler.ProfileUpdate)
+	route.GET("/", handler.FetchAllProfile)
+	route.GET("/:id" , handler.FetchDetailProfile)
+	route.DELETE("/:id" , handler.DeleteProfile)
+	
 }

@@ -38,6 +38,40 @@ func (r *RepoProfile) CreatedProfile(data *models.Profile, id string) (string, e
 	return "1 data profile created", nil
 }
 
+func (r *RepoProfile) GetAllProfile() (*models.Profiles , error){
+	query := `SELECT * FROM public.profile `
+	data := models.Profiles{}
+
+	if err := r.Select(&data , query); err != nil {
+		return nil , err
+	}
+
+	return &data , nil
+}
+
+func (r *RepoProfile) GetDetailProfile(id string) (*models.Profile, error) {
+	query := `SELECT * FROM public.profile WHERE user_id = $1`
+	row := r.QueryRow(query, id)
+
+	var profile models.Profile
+	if err := row.Scan(
+		&profile.User_id,
+		&profile.Display_name,
+		&profile.First_name,
+		&profile.Last_name,
+		&profile.Birth_date,
+		&profile.Image,
+		&profile.Delivery_address,
+		&profile.Role,
+	); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("error retrieving profile: %w", err)
+	}
+
+	return &profile, nil
+}
 
 func (r *RepoProfile) EditProfile(data *models.Profile , id string) (*models.Profile, error) {
     query := `UPDATE profile SET `
@@ -138,3 +172,20 @@ func (r *RepoProfile) EditProfile(data *models.Profile , id string) (*models.Pro
 
     return &profile, nil
 }
+
+
+func (r *RepoProfile) DeleteProfiles(id string) (string, error) {
+    query := `DELETE FROM public.profile WHERE user_id = $1 RETURNING user_id`
+    row := r.QueryRow(query, id)
+
+    var deletedID string
+    if err := row.Scan(&deletedID); err != nil {
+        if err == sql.ErrNoRows {
+            return "", fmt.Errorf("profile with ID %s not found", id)
+        }
+        return "", fmt.Errorf("error while deleting profile: %w", err)
+    }
+
+    return "delete successful", nil
+}
+
