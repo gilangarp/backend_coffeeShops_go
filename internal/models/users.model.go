@@ -12,4 +12,11 @@ type User struct {
 	UpdatedAt 	time.Time `db:"updated_at" json:"updated_at"`
 }
 
+type UserDetail struct {
+	Email     	string    `db:"email" json:"email"`
+	Phone     	string    `db:"phone" json:"phone"`
+	CreatedAt 	time.Time `db:"created_at" json:"created_at"`
+	UpdatedAt 	time.Time `db:"updated_at" json:"updated_at"`
+}
+
 type Users []User

@@ -16,6 +16,7 @@ func NewProfile(db *sqlx.DB) *RepoProfile {
 	return &RepoProfile{db}
 }
 
+/* Created Profile */
 func (r *RepoProfile) CreatedProfile(data *models.Profile, id string) (string, error) {
 	query := `
 	INSERT INTO profile (
@@ -38,6 +39,7 @@ func (r *RepoProfile) CreatedProfile(data *models.Profile, id string) (string, e
 	return "1 data profile created", nil
 }
 
+/* Get All Profile */
 func (r *RepoProfile) GetAllProfile() (*models.Profiles , error){
 	query := `SELECT * FROM public.profile `
 	data := models.Profiles{}
@@ -49,6 +51,7 @@ func (r *RepoProfile) GetAllProfile() (*models.Profiles , error){
 	return &data , nil
 }
 
+/* Get Detail Profile */
 func (r *RepoProfile) GetDetailProfile(id string) (*models.Profile, error) {
 	query := `SELECT * FROM public.profile WHERE user_id = $1`
 	row := r.QueryRow(query, id)
@@ -73,6 +76,7 @@ func (r *RepoProfile) GetDetailProfile(id string) (*models.Profile, error) {
 	return &profile, nil
 }
 
+/* Edit Profile */
 func (r *RepoProfile) EditProfile(data *models.Profile , id string) (*models.Profile, error) {
     query := `UPDATE profile SET `
     var values []interface{}
@@ -173,7 +177,7 @@ func (r *RepoProfile) EditProfile(data *models.Profile , id string) (*models.Pro
     return &profile, nil
 }
 
-
+/* Delete Profiles */
 func (r *RepoProfile) DeleteProfiles(id string) (string, error) {
     query := `DELETE FROM public.profile WHERE user_id = $1 RETURNING user_id`
     row := r.QueryRow(query, id)

@@ -46,3 +46,44 @@ func (h *HandlerUser) FetchAllUser(ctx *gin.Context){
 	}
 	ctx.JSON(200 , data)
 }
+
+func (h *HandlerUser) FetchDetailUser(ctx *gin.Context){
+	id := ctx.Param("id")
+	data , err := h.GetDetailUser(id)
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	ctx.JSON(200 , data)
+}
+
+func (h *HandlerUser) UserUpdate(ctx *gin.Context) {
+	user := models.User{}
+
+	if err := ctx.ShouldBindJSON(&user); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	id := ctx.Param("id")
+	
+	updatedProfile, err := h.EditUsers(&user, id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, updatedProfile)
+}
+
+func (h *HandlerUser) DeleteUsers(ctx *gin.Context){
+	id := ctx.Param("id")
+	data , err := h.DeleteUser(id)
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	ctx.JSON(200 , data)
+}
+
+

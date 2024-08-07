@@ -26,13 +26,13 @@ func (h *HandlerProfile) PostProfile(ctx *gin.Context){
 
 	id := ctx.Param("id")
 	
-	updatedProfile, err := h.CreatedProfile(&profile, id)
+	createdProfile, err := h.CreatedProfile(&profile, id)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, updatedProfile)
+	ctx.JSON(http.StatusOK, createdProfile)
 }
 
 func (h *HandlerProfile) FetchAllProfile(ctx *gin.Context){

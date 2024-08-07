@@ -65,3 +65,42 @@ func (h *HandlerProduct) FetchAllProduct(ctx *gin.Context){
 	ctx.JSON(200 , data)
 
 }
+
+func (h *HandlerProduct) FetchDetailProduct(ctx *gin.Context){
+	id := ctx.Param("id")
+	data , err := h.GetDetailProduct(id)
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	ctx.JSON(200 , data)
+}
+
+func (h *HandlerProduct) ProductUpdate(ctx *gin.Context) {
+	product := models.EditProduct{}
+
+	if err := ctx.ShouldBindJSON(&product); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	id := ctx.Param("id")
+	
+	updatedProduct, err := h.EditProduct(&product, id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, updatedProduct)
+}
+
+func (h *HandlerProduct) DeleteProducts(ctx *gin.Context){
+	id := ctx.Param("id")
+	data , err := h.DeleteProduct(id)
+	if err != nil {
+		ctx.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
+	ctx.JSON(200 , data)
+}
